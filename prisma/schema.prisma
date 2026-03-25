@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+// User roles
+// USER: Regular business user
+// ADMIN: Admin user who can update shipment status
+
+// Shipment statuses
+// PENDING: Created, waiting for pickup
+// IN_TRANSIT: In transit with carrier
+// OUT_FOR_DELIVERY: Out for delivery
+// DELIVERED: Successfully delivered
+// FAILED: Delivery failed
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  company   String?
+  phone     String?
+
+  role String @default("USER") // USER | ADMIN
+
+  shipments Shipment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Shipment {
+  id        String   @id @default(cuid())
+  trackingId String  @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Sender details
+  senderName    String
+  senderEmail   String
+  senderPhone   String
+  senderAddress String
+  senderCity    String
+
+  // Receiver details
+  receiverName    String
+  receiverEmail   String
+  receiverPhone   String
+  receiverAddress String
+  receiverCity    String
+
+  // Package details
+  description String
+  weight      Float
+  dimensions  String?
+
+  // Current status (PENDING | IN_TRANSIT | OUT_FOR_DELIVERY | DELIVERED | FAILED)
+  currentStatus String @default("PENDING")
+
+  // Relationships
+  statusHistory ShipmentStatusHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trackingId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ShipmentStatusHistory {
+  id        String   @id @default(cuid())
+  shipmentId String
+  shipment  Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  status String // PENDING | IN_TRANSIT | OUT_FOR_DELIVERY | DELIVERED | FAILED
+  notes  String?
+
+  updatedAt DateTime @default(now())
+
+  @@index([shipmentId])
+  @@index([updatedAt])
+}

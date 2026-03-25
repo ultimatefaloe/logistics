@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  logistics_db:
+    image: postgis/postgis:16-3.4
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ultimate25
+      POSTGRES_DB: gul_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - gulNetwork
+
+networks:
+  gulNetwork:
+    driver: bridge
+
+volumes:
+  db_data:
