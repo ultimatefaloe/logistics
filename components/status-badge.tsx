@@ -3,17 +3,17 @@
 import { cn } from "@/lib/utils";
 
 const statusStyles: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  Processing: "bg-yellow-100 text-yellow-800 border-yellow-200", // Some might be mixed case
-  IN_TRANSIT: "bg-blue-100 text-blue-800 border-blue-200",
-  In_Transit: "bg-blue-100 text-blue-800 border-blue-200",
-  OUT_FOR_DELIVERY: "bg-purple-100 text-purple-800 border-purple-200",
-  DELIVERED: "bg-green-100 text-green-800 border-green-200",
-  Delivered: "bg-green-100 text-green-800 border-green-200",
-  FAILED: "bg-red-100 text-red-800 border-red-200",
-  Cancelled: "bg-red-100 text-red-800 border-red-200",
+  PENDING: "bg-accent text-muted-foreground border-accent",
+  Processing: "bg-accent text-muted-foreground border-accent",
+  IN_TRANSIT: "bg-secondary/10 text-secondary border-secondary/20",
+  In_Transit: "bg-secondary/10 text-secondary border-secondary/20",
+  OUT_FOR_DELIVERY: "bg-secondary/20 text-secondary border-secondary/30",
+  DELIVERED: "bg-primary/10 text-primary border-primary/20",
+  Delivered: "bg-primary/10 text-primary border-primary/20",
+  FAILED: "bg-destructive/10 text-destructive border-destructive/20",
+  Cancelled: "bg-destructive/10 text-destructive border-destructive/20",
   // Fallback
-  DEFAULT: "bg-gray-100 text-gray-800 border-gray-200",
+  DEFAULT: "bg-accent text-muted-foreground border-accent",
 };
 
 interface StatusBadgeProps {

@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface TrackingData {
   trackingId: string;
@@ -17,13 +20,39 @@ interface TrackingData {
   }>;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "#FBBF24",
-  IN_TRANSIT: "#3B82F6",
-  OUT_FOR_DELIVERY: "#A855F7",
-  DELIVERED: "#10B981",
-  FAILED: "#EF4444",
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return 'bg-accent border-accent text-foreground';
+    case 'IN_TRANSIT':
+      return 'bg-secondary text-white border-secondary';
+    case 'OUT_FOR_DELIVERY':
+      return 'bg-secondary text-white border-secondary';
+    case 'DELIVERED':
+      return 'bg-primary text-white border-primary';
+    case 'FAILED':
+      return 'bg-destructive text-white border-destructive';
+    default:
+      return 'bg-muted text-muted-foreground border-border';
+  }
 };
+
+const getStatusDotColor = (status: string) => {
+   switch (status) {
+    case 'PENDING':
+      return 'bg-muted-foreground/30';
+    case 'IN_TRANSIT':
+      return 'bg-secondary';
+    case 'OUT_FOR_DELIVERY':
+      return 'bg-secondary';
+    case 'DELIVERED':
+      return 'bg-primary';
+    case 'FAILED':
+      return 'bg-destructive';
+    default:
+      return 'bg-muted';
+  }
+}
 
 export default function TrackingResultPage() {
   const params = useParams();
@@ -55,135 +84,100 @@ export default function TrackingResultPage() {
 
   if (loading) {
     return (
-      <>
-        <main
-          style={{ backgroundColor: "var(--color-accent)" }}
-          className="min-h-screen py-16"
-        >
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="card text-center">
-              <p className="text-gray-600">Loading tracking information...</p>
-            </div>
-          </div>
-        </main>
-      </>
+      <main className="min-h-screen bg-accent py-16 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </main>
     );
   }
 
   if (error || !tracking) {
     return (
-      <>
-        <main
-          style={{ backgroundColor: "var(--color-accent)" }}
-          className="min-h-screen py-16"
-        >
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="card">
-              <h1
-                className="font-display text-2xl font-bold mb-4"
-                style={{ color: "#dc2626" }}
-              >
+      <main className="min-h-screen bg-accent py-16 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+           <CardContent className="text-center pt-6">
+              <h1 className="font-display text-2xl font-bold mb-4 text-destructive">
                 Shipment Not Found
               </h1>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 The tracking ID {trackingId} could not be found. Please check
                 the ID and try again.
               </p>
-              <Link
-                href="/track"
-                className="btn-primary"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                Back to Tracking
+              <Link href="/track">
+                <Button className="w-full">
+                  Back to Tracking
+                </Button>
               </Link>
-            </div>
-          </div>
-        </main>
-      </>
+           </CardContent>
+        </Card>
+      </main>
     );
   }
 
   return (
-    <>
-      <main
-        style={{ backgroundColor: "var(--color-accent)" }}
-        className="min-h-screen py-16"
-      >
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="card">
-            <div className="mb-8">
-              <h1
-                className="font-display text-4xl font-bold mb-2"
-                style={{ color: "var(--color-primary)" }}
-              >
-                Tracking ID: {tracking.trackingId}
-              </h1>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-600">
-                  From <strong>{tracking.senderCity}</strong> to{" "}
-                  <strong>{tracking.receiverCity}</strong>
-                </p>
-                <div
-                  style={{
-                    backgroundColor: STATUS_COLORS[tracking.currentStatus],
-                  }}
-                  className="px-4 py-2 rounded text-white font-medium"
-                >
-                  {tracking.currentStatus}
+    <main className="min-h-screen bg-accent py-16 p-4">
+        <div className="max-w-3xl mx-auto">
+          <Card>
+            <CardHeader className="border-b border-accent pb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                 <div>
+                    <h1 className="font-display text-3xl font-bold text-primary mb-1">
+                      {tracking.trackingId}
+                    </h1>
+                     <p className="text-muted-foreground">
+                      From <strong className="text-foreground">{tracking.senderCity}</strong> to{" "}
+                      <strong className="text-foreground">{tracking.receiverCity}</strong>
+                    </p>
+                 </div>
+                 <div
+                  className={cn("px-4 py-2 rounded-full font-medium text-sm border shadow-sm self-start md:self-center", getStatusColor(tracking.currentStatus))}
+                 >
+                  {tracking.currentStatus.replace(/_/g, " ")}
                 </div>
               </div>
-            </div>
+            </CardHeader>
+            
+            <CardContent className="pt-8">
+               {/* Timeline */}
+              <div className="relative pl-2">
+                 {/* Vertical Line Background */}
+                 <div className="absolute left-[15px] top-2 bottom-4 w-[2px] bg-accent h-full -z-10" />
 
-            {/* Timeline */}
-            <div className="relative">
-              <div className="space-y-8">
-                {tracking.timeline.map((entry, index) => (
-                  <div key={entry.id} className="flex">
-                    <div className="flex flex-col items-center mr-4">
-                      <div
-                        style={{ backgroundColor: STATUS_COLORS[entry.status] }}
-                        className="w-4 h-4 rounded-full"
-                      />
-                      {index < tracking.timeline.length - 1 && (
-                        <div
-                          style={{
-                            backgroundColor: STATUS_COLORS[entry.status],
-                            opacity: 0.3,
-                          }}
-                          className="w-0.5 h-12 mt-2"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">
-                        {entry.status.replace(/_/g, " ")}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {new Date(entry.updatedAt).toLocaleString()}
-                      </p>
-                      {entry.notes && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          {entry.notes}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                 <div className="space-y-8">
+                    {tracking.timeline.map((entry, index) => (
+                      <div key={entry.id} className="flex gap-4">
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={cn("w-4 h-4 rounded-full ring-4 ring-white mt-1", getStatusDotColor(entry.status))}
+                          />
+                        </div>
+                        <div className="flex-1 pb-4">
+                          <h3 className="font-semibold text-primary">
+                            {entry.status.replace(/_/g, " ")}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mb-1">
+                            {new Date(entry.updatedAt).toLocaleString()}
+                          </p>
+                          {entry.notes && (
+                            <p className="text-sm text-foreground/80 bg-accent/50 p-3 rounded-md mt-2">
+                              {entry.notes}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                 </div>
               </div>
-            </div>
 
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <Link
-                href="/track"
-                className="btn-primary"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                Track Another Shipment
-              </Link>
-            </div>
-          </div>
+               <div className="mt-8 pt-8 border-t border-accent flex justify-end">
+                <Link href="/track">
+                  <Button variant="outline">
+                    Track Another Shipment
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </main>
-    </>
+    </main>
   );
 }

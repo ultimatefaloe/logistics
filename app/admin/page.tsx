@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+
 interface Stats {
   total: number;
   pending: number;
@@ -41,7 +44,7 @@ export default function AdminDashboardPage() {
     fetchStats();
   }, []);
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <div className="p-6 text-primary">Loading...</div>;
 
   return (
     <div className="p-6">
@@ -51,24 +54,28 @@ export default function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {[
-          { label: 'Total Shipments', value: stats?.total || 0, color: '#0D1F3C' },
-          { label: 'Pending', value: stats?.pending || 0, color: '#FBBF24' },
-          { label: 'In Transit', value: stats?.inTransit || 0, color: '#3B82F6' },
-          { label: 'Delivered', value: stats?.delivered || 0, color: '#10B981' },
+          { label: 'Total Shipments', value: stats?.total || 0, className: 'text-primary' },
+          { label: 'Pending', value: stats?.pending || 0, className: 'text-secondary' },
+          { label: 'In Transit', value: stats?.inTransit || 0, className: 'text-secondary' },
+          { label: 'Delivered', value: stats?.delivered || 0, className: 'text-green-600' },
         ].map((stat, index) => (
-          <div key={index} className="card">
-            <p className="text-gray-600 text-sm">{stat.label}</p>
-            <p className="text-3xl font-bold mt-2" style={{ color: stat.color }}>
-              {stat.value}
-            </p>
-          </div>
+          <Card key={index}>
+            <CardContent className="p-6">
+              <p className="text-muted-foreground text-sm font-medium">{stat.label}</p>
+              <p className={cn("text-3xl font-bold mt-2", stat.className)}>
+                {stat.value}
+              </p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      <div className="card">
-        <h2 className="font-semibold text-lg text-primary mb-4">Recent Activity</h2>
-        <p className="text-gray-600">Navigate to "All Shipments" to manage shipments and update statuses.</p>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="font-semibold text-lg text-primary mb-4">Recent Activity</h2>
+          <p className="text-muted-foreground">Navigate to "All Shipments" to manage shipments and update statuses.</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -54,23 +54,23 @@ export default function AdminLayout({
   return (
     <>
       <Navbar />
-      <div className="flex">
-        <nav className="w-64 bg-gray-900 text-white p-4 min-h-screen">
-          <h2 className="font-display text-xl font-bold mb-6">Admin Menu</h2>
+      <div className="flex bg-accent min-h-screen">
+        <nav className="w-64 bg-primary text-white p-4 hidden md:block border-r border-white/10">
+          <h2 className="font-display text-xl font-bold mb-6 text-white">Admin Menu</h2>
           <ul className="space-y-4">
             <li>
-              <a href="/admin" className="hover:text-secondary transition">
+              <a href="/admin" className="block text-white/80 hover:text-secondary transition-colors">
                 Dashboard
               </a>
             </li>
             <li>
-              <a href="/admin/shipments" className="hover:text-secondary transition">
+              <a href="/admin/shipments" className="block text-white/80 hover:text-secondary transition-colors">
                 All Shipments
               </a>
             </li>
           </ul>
         </nav>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 p-6">{children}</main>
       </div>
     </>
   );

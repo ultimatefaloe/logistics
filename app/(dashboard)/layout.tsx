@@ -82,25 +82,25 @@ export default function DashboardLayout({
   const PageTitle = navItems.find((item) => pathname.startsWith(item.href))?.title || 'Dashboard';
 
   return (
-    <div className="min-h-screen bg-muted/20 flex">
+    <div className="min-h-screen bg-accent flex">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-primary text-white border-r border-white/10 transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex h-16 items-center border-b px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-display font-bold text-xl text-primary">
+        <div className="flex h-16 items-center border-b border-white/10 px-6">
+          <Link href="/dashboard" className="flex items-center gap-2 font-display font-bold text-xl text-white">
             <span>Global Ultra</span>
           </Link>
-          <Button variant="ghost" size="icon" className="ml-auto lg:hidden" onClick={() => setIsSidebarOpen(false)}>
+          <Button variant="ghost" size="icon" className="ml-auto lg:hidden text-white hover:bg-white/10" onClick={() => setIsSidebarOpen(false)}>
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -108,7 +108,7 @@ export default function DashboardLayout({
         <div className="flex-1 overflow-auto py-6 px-3">
            <div className="mb-6 px-3">
             <Link href="/shipments/new">
-             <Button className="w-full gap-2" size="lg">
+             <Button variant="secondary" className="w-full gap-2" size="lg">
                <Plus className="h-4 w-4" />
                New Shipment
              </Button>
@@ -123,10 +123,10 @@ export default function DashboardLayout({
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-primary hover:bg-muted",
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-white hover:bg-white/10",
                     isActive 
-                      ? "bg-primary/10 text-primary hover:bg-primary/15" 
-                      : "text-muted-foreground"
+                      ? "bg-secondary text-white shadow-sm" 
+                      : "text-white/70"
                   )}
                   onClick={() => setIsSidebarOpen(false)}
                 >
@@ -138,10 +138,10 @@ export default function DashboardLayout({
           </nav>
         </div>
 
-        <div className="border-t p-4">
+        <div className="border-t border-white/10 p-4">
           <Button 
             variant="ghost" 
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground" 
+            className="w-full justify-start gap-2 text-white/70 hover:text-white hover:bg-white/5" 
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4" />

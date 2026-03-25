@@ -35,7 +35,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-24 bg-muted/40">
+        <section className="py-24 bg-accent">
            <div className="container mx-auto px-4">
               <div className="text-center mb-16 space-y-4">
                  <h2 className="font-display text-3xl font-bold text-primary md:text-5xl">Why Choose Us?</h2>
@@ -69,8 +69,8 @@ export default function Home() {
                  </Card>
                  <Card className="border shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader className="space-y-4">
-                       <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                         <Clock className="h-6 w-6 text-green-600" />
+                       <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                         <Clock className="h-6 w-6 text-primary" />
                        </div>
                        <CardTitle className="text-xl">On-Time Delivery</CardTitle>
                        <CardDescription className="text-base">

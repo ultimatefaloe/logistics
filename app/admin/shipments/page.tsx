@@ -3,37 +3,49 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { StatusBadge } from '@/components/status-badge';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Search, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface Shipment {
   id: string;
   trackingId: string;
-  user: {
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
   receiverName: string;
   currentStatus: string;
   createdAt: string;
+  user?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 export default function AdminShipmentsPage() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [status, setStatus] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
     const fetchShipments = async () => {
+      setLoading(true);
       try {
         const query = new URLSearchParams({
           page: page.toString(),
           limit: '10',
-          ...(status && { status }),
+          ...(statusFilter && { status: statusFilter }),
         });
-        const res = await fetch(`/api/admin/shipments?${query}`, {
+        const res = await fetch(`/api/admin/shipments?${query.toString()}`, {
           credentials: 'include',
         });
         if (!res.ok) throw new Error('Failed to fetch shipments');
@@ -41,108 +53,133 @@ export default function AdminShipmentsPage() {
         setShipments(data.data?.data || []);
         setTotal(data.data?.pagination?.total || 0);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchShipments();
-  }, [page, status]);
-
-  if (loading) return <div className="p-6">Loading...</div>;
+  }, [page, statusFilter]);
 
   return (
-    <div className="p-6">
-      <h1 className="font-display text-3xl font-bold text-primary mb-6">
-        All Shipments
-      </h1>
-
-      {error && <div className="alert alert-error mb-6">{error}</div>}
-
-      <div className="mb-6">
-        <select
-          value={status}
-          onChange={(e) => {
-            setStatus(e.target.value);
-            setPage(1);
-          }}
-          className="input"
-        >
-          <option value="">All Statuses</option>
-          <option value="PENDING">Pending</option>
-          <option value="IN_TRANSIT">In Transit</option>
-          <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-          <option value="DELIVERED">Delivered</option>
-          <option value="FAILED">Failed</option>
-        </select>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-display font-bold tracking-tight text-primary">All Shipments</h2>
+          <p className="text-muted-foreground">
+            Manage all system shipments and status updates.
+          </p>
+        </div>
+        <Link href="/shipments/new">
+          <Button>
+            Create Shipment
+          </Button>
+        </Link>
       </div>
 
-      {shipments.length === 0 ? (
-        <div className="card text-center">
-          <p className="text-gray-600">No shipments found</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left font-semibold">Tracking ID</th>
-                <th className="px-6 py-3 text-left font-semibold">User</th>
-                <th className="px-6 py-3 text-left font-semibold">Receiver</th>
-                <th className="px-6 py-3 text-left font-semibold">Status</th>
-                <th className="px-6 py-3 text-left font-semibold">Created</th>
-                <th className="px-6 py-3 text-left font-semibold">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shipments.map((shipment) => (
-                <tr key={shipment.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 font-mono text-sm">{shipment.trackingId}</td>
-                  <td className="px-6 py-4 text-sm">
-                    {shipment.user.firstName} {shipment.user.lastName}
-                  </td>
-                  <td className="px-6 py-4">{shipment.receiverName}</td>
-                  <td className="px-6 py-4">
-                    <StatusBadge status={shipment.currentStatus} />
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {new Date(shipment.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/admin/shipments/${shipment.id}`}
-                      className="text-secondary hover:underline text-sm font-semibold"
+      <Card>
+        <CardHeader>
+           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <CardTitle>Shipment List</CardTitle>
+                <CardDescription>View and manage all shipments across the platform.</CardDescription>
+              </div>
+              <div className="flex w-full max-w-sm items-center space-x-2">
+                 <div className="relative flex-1">
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
                     >
-                      Manage
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="flex justify-between items-center mt-6">
-            <button
-              onClick={() => setPage(Math.max(1, page - 1))}
-              disabled={page === 1}
-              className="btn-outline disabled:opacity-50"
+                      <option value="">All Statuses</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="IN_TRANSIT">In Transit</option>
+                      <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                      <option value="DELIVERED">Delivered</option>
+                      <option value="FAILED">Failed</option>
+                    </select>
+                 </div>
+              </div>
+           </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+             <div className="flex justify-center p-8">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+             </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tracking ID</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Receiver</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {shipments.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No shipments found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  shipments.map((shipment) => (
+                    <TableRow key={shipment.id}>
+                      <TableCell className="font-medium text-primary">
+                        {shipment.trackingId}
+                      </TableCell>
+                      <TableCell>
+                        {shipment.user ? `${shipment.user.firstName} ${shipment.user.lastName}` : 'N/A'}
+                      </TableCell>
+                      <TableCell>{shipment.receiverName}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={shipment.currentStatus} />
+                      </TableCell>
+                      <TableCell>{new Date(shipment.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/admin/shipments/${shipment.id}`}>
+                          <Button variant="outline" size="sm">
+                            Manage
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          )}
+          
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
             >
+              <ChevronLeft className="h-4 w-4" />
               Previous
-            </button>
-            <p className="text-gray-600">
-              Page {page} of {Math.ceil(total / 10)}
-            </p>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={page * 10 >= total}
-              className="btn-outline disabled:opacity-50"
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              Page {page} of {Math.max(1, Math.ceil(total / 10))}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => p + 1)}
+              disabled={page * 10 >= total || loading}
             >
               Next
-            </button>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
